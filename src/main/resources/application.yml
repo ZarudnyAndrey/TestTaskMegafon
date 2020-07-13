@@ -1,0 +1,88 @@
+server:
+  port: 8080
+  tomcat:
+    max-swallow-size: -1
+
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  servlet:
+    multipart.max-file-size: 3MB
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc.batch_size: 20
+        criteria.literal_handling_mode: BIND
+        show-sql: true
+        format-sql: true
+        use_sql_comments: true
+
+---
+
+spring:
+  profiles: default
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/megafon?currentSchema=mf
+    username: postgres
+    password: 1234
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 7190000
+      minimumIdle: 2
+      maximumPoolSize: 50
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    default-property-inclusion: NON_NULL
+
+  liquibase:
+    enabled: false
+    change-log: classpath:database_changelog.xml
+    url: jdbc:postgresql://localhost:5432/megafon?currentSchema=mf
+    user: postgres
+    password: 1234
+
+---
+
+spring:
+  profiles: test
+  logging:
+    level:
+      ROOT: DEBUG
+
+  datasource:
+    driverClassName: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:postgresql://localhost:5432/megafon?currentSchema=test
+    username: postgres
+    password: 1234
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 600000
+      maxLifetime: 7190000
+      minimumIdle: 2
+      maximumPoolSize: 50
+
+  liquibase:
+    enabled: true
+    change-log: classpath:database_changelog_test_data.xml
+    url: jdbc:postgresql://localhost:5432/megafon?currentSchema=test
+    user: postgres
+    password: 1234
+    drop-first: true
+
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    default-property-inclusion: non_null
